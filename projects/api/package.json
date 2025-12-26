@@ -1,0 +1,18 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "pnpm build",
+    "fetch:spec": "curl https://spammerino-api.vercel.app/doc > swagger.json",
+    "clean:client": "rimraf src/lib",
+    "generate:client": "pnpm clean:client && ng-openapi -c openapi.config.ts"
+  },
+  "peerDependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}

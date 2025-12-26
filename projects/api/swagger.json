@@ -1,0 +1,549 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Spammerino API"
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "broadcasterType": {
+            "type": "string"
+          },
+          "profilePictureUrl": {
+            "type": "string"
+          },
+          "offlinePlaceholderUrl": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "displayName",
+          "description",
+          "type",
+          "broadcasterType",
+          "profilePictureUrl",
+          "offlinePlaceholderUrl",
+          "creationDate"
+        ]
+      },
+      "EmoteType": {
+        "type": "string",
+        "enum": ["seventvemote", "ffzemote", "bttvemote", "twitchemote"]
+      },
+      "Emote": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/EmoteType"
+          }
+        },
+        "required": ["name", "link", "type"]
+      },
+      "Badge": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          }
+        },
+        "required": ["name", "link"]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/users/search/{userName}": {
+      "get": {
+        "operationId": "searchUsers",
+        "summary": "Search for users by their username",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "userName"
+            },
+            "required": true,
+            "name": "userName",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "example": {
+                    "message": "Not Found"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid userName error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "issues": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
+                              },
+                              "message": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["code", "path"]
+                          }
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["issues", "name"],
+                      "example": {
+                        "name": "ZodError",
+                        "issues": [
+                          {
+                            "code": "invalid_type",
+                            "path": ["userName"],
+                            "message": "Invalid input: expected string, received undefined"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["success", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userName}": {
+      "get": {
+        "operationId": "getUserByUsername",
+        "summary": "Get a user by their username",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "userName"
+            },
+            "required": true,
+            "name": "userName",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "example": {
+                    "message": "Not Found"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid userName error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "issues": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
+                              },
+                              "message": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["code", "path"]
+                          }
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["issues", "name"],
+                      "example": {
+                        "name": "ZodError",
+                        "issues": [
+                          {
+                            "code": "invalid_type",
+                            "path": ["userName"],
+                            "message": "Invalid input: expected string, received undefined"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["success", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userName}/emotes": {
+      "get": {
+        "operationId": "getEmotesByUsername",
+        "summary": "Get a user's emotes by their username",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "userName"
+            },
+            "required": true,
+            "name": "userName",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested user's emotes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Emote"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User emotes not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "example": {
+                    "message": "Not Found"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid userName error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "issues": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
+                              },
+                              "message": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["code", "path"]
+                          }
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["issues", "name"],
+                      "example": {
+                        "name": "ZodError",
+                        "issues": [
+                          {
+                            "code": "invalid_type",
+                            "path": ["message"],
+                            "message": "Invalid input: expected string, received undefined"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["success", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userName}/badges": {
+      "get": {
+        "operationId": "getBadgesByUsername",
+        "summary": "Get available badges for user channel",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "userName"
+            },
+            "required": true,
+            "name": "userName",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested user's badges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Badge"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User badges not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "example": {
+                    "message": "Not Found"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid userName error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "issues": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
+                              },
+                              "message": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["code", "path"]
+                          }
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["issues", "name"],
+                      "example": {
+                        "name": "ZodError",
+                        "issues": [
+                          {
+                            "code": "invalid_type",
+                            "path": ["message"],
+                            "message": "Invalid input: expected string, received undefined"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["success", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
