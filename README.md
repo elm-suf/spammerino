@@ -1,59 +1,114 @@
 # Spammerino
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.3.
+Modern Angular 21 application with a generated OpenAPI client, Spartan NG UI components, Tailwind CSS, and Vitest for unit testing. The app is built with pnpm and the Angular CLI, and includes a library for consuming the Spammerino API.
 
-## Development server
+## Tech Stack
 
-To start a local development server, run:
+- Angular 21 (CLI and build system)
+- pnpm 9 (package manager)
+- Tailwind CSS 4 + PostCSS
+- Spartan NG (brain/helm) component primitives
+- ng-icons (Lucide icons)
+- Vitest (Angular CLI unit-test builder)
+- OpenAPI client generation via ng-openapi
+
+## Prerequisites
+
+- Node.js 18+ or 20+
+- pnpm installed globally (version ~9)
+
+## Getting Started
+
+Install dependencies:
 
 ```bash
-ng serve
+pnpm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Start the development server:
 
 ```bash
-ng generate component component-name
+pnpm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open http://localhost:4200/ in your browser. The server reloads on file changes.
+
+## Scripts
+
+- `pnpm start` – run the dev server
+- `pnpm build` – production build to `dist/`
+- `pnpm test` – run unit tests with Vitest
+- `pnpm watch` – development build in watch mode
+
+## Project Structure
+
+- Application: `src/` (entry: `src/main.ts`, global styles: `src/styles.css`, static assets: `public/`)
+- API Library: `projects/api` (generated client, models, services)
+- UI Library: `projects/ui` (design system directives/components built on Spartan NG)
+- Configuration: `angular.json` for build/serve targets, `tsconfig.*.json` for TypeScript
+
+## API Client
+
+The API client in `projects/api` is generated from an OpenAPI spec and exposed as an Angular library.
+
+- Spec location: `projects/api/swagger.json`
+- Generator config: `projects/api/openapi.config.ts`
+- Default base path token: `BASE_PATH_SPAMMERINOAPI` (defaults to `/api`)
+
+Regenerate the client:
 
 ```bash
-ng generate --help
+cd projects/api
+pnpm fetch:spec          # fetch latest OpenAPI spec
+pnpm generate:client     # clean and regenerate the client
 ```
+
+If you don’t have ng-openapi installed locally, you can also run:
+
+```bash
+pnpm dlx ng-openapi -c openapi.config.ts
+```
+
+Override the API base URL in your app (e.g., in a bootstrapping module/provider):
+
+```ts
+import { BASE_PATH_SPAMMERINOAPI } from '@api';
+providers: [{ provide: BASE_PATH_SPAMMERINOAPI, useValue: 'https://spammerino-api.vercel.app' }];
+```
+
+## UI & Styling
+
+- Tailwind CSS v4 is enabled via PostCSS; global styles in `src/styles.css`.
+- Spartan NG (brain and helm) provides accessible primitives and utility directives used across `projects/ui`.
+- Lucide icons via `@ng-icons/lucide`.
 
 ## Building
 
-To build the project run:
+Create a production build:
 
 ```bash
-ng build
+pnpm build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Artifacts are output to `dist/`. Production builds enable optimization and output hashing.
 
-## Running unit tests
+## Testing
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Run unit tests:
 
 ```bash
-ng test
+pnpm test
 ```
 
-## Running end-to-end tests
+Vitest is configured via the Angular CLI unit-test builder. Type definitions are wired through `tsconfig.spec.json`.
 
-For end-to-end (e2e) testing, run:
+## Notes
 
-```bash
-ng e2e
-```
+- End-to-end testing is not preconfigured. Choose and set up your preferred e2e framework as needed.
+- The workspace uses pnpm as the package manager.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Useful References
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Angular CLI project configuration: `angular.json`
+- API client tokens and providers: `projects/api/src/lib/tokens/index.ts`, `projects/api/src/lib/providers.ts`
+- OpenAPI generator config: `projects/api/openapi.config.ts`
