@@ -54,9 +54,10 @@ import { HlmCode } from '@spartan-ng/helm/typography';
           [class.rotate-360]="state() === 'open'"
         />
       </button>
-      <p class="hidden md:block">Press <code hlmCode>⌘ + K</code></p>
+      <p class="hidden md:block">Press <code hlmCode>⌘ + Shift + K</code></p>
     </div>
-    <hlm-dialog [state]="state()" (stateChanged)="stateChanged($event)">
+
+    <hlm-dialog [state]="state()">
       <hlm-command *brnDialogContent="let ctx" hlmCommandDialog class="mx-auto sm:w-[400px]">
         <hlm-command-search>
           <ng-icon hlm name="lucideSearch" />
@@ -98,7 +99,11 @@ export class CommandDialog {
   public readonly state = signal<'closed' | 'open'>('closed');
 
   onKeyDown(event: KeyboardEvent) {
-    if ((event.metaKey || event.ctrlKey) && (event.key === 'k' || event.key === 'K')) {
+    if (
+      (event.metaKey || event.ctrlKey) &&
+      event.shiftKey &&
+      (event.key === 'k' || event.key === 'K')
+    ) {
       this.state.set('open');
     }
   }
@@ -117,6 +122,7 @@ export class CommandDialog {
   }
 
   handleSelect(user: User): void {
+    this.stateChanged('closed');
     this.selectEvent.emit(user);
   }
 }

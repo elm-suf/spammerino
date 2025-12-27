@@ -86,14 +86,14 @@ export const AppStore = signalStore(
       router.events
         .pipe(
           filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-          takeUntilDestroyed(),
+          takeUntilDestroyed()
         )
         .subscribe(() => {
           const childRoute = route.firstChild ?? route;
-          const userName = childRoute.snapshot.paramMap.get('userName') ?? '';
+          const channelName = childRoute.snapshot.paramMap.get('channelName') ?? '';
 
-          store.setUserName(userName);
+          store.setUserName(channelName);
         });
     },
-  }),
+  })
 );

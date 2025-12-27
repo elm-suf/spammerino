@@ -1,18 +1,29 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { User } from '@api';
+import { HlmToasterImports } from '@spartan-ng/helm/sonner';
 import { AppStore } from './app.state';
 import { CommandDialog } from './components/command-dialog';
 import { FooterComponent } from './components/footer';
 import { HeaderComponent } from './components/header';
-import { NgTemplateOutlet } from '@angular/common';
+import { ChannelPageComponent } from './pages/channel-page/channel-page';
+import { ChatService } from './services/chat.service';
 
+export type Views = 'aside' | 'main' | 'chat';
 @Component({
   selector: 'app-root',
   host: {
-    class: 'flex flex-col min-h-screen',
+    class: 'flex flex-col h-screen overflow-hidden',
   },
-  imports: [HeaderComponent, CommandDialog, FooterComponent, NgTemplateOutlet, RouterOutlet],
+  imports: [
+    HeaderComponent,
+    CommandDialog,
+    FooterComponent,
+    NgTemplateOutlet,
+    HlmToasterImports,
+    ChannelPageComponent,
+  ],
   template: `
     <app-header>
       <div class="hidden md:block">
@@ -20,11 +31,17 @@ import { NgTemplateOutlet } from '@angular/common';
       </div>
     </app-header>
 
-    <main class="flex-1 grid place-items-center">
-      <router-outlet />
+    <main class="flex-1 overflow-hidden">
+      @if(selectedUser(); as user){
+      <app-channel-page
+        [channel]="user"
+        [emotes]="emotes()"
+        [msgs]="msgs()"
+        [mobileView]="mobileView()"
+      />
+      }
     </main>
-
-    <app-footer class="md:hidden">
+    <app-footer class="md:hidden" [(mobileView)]="mobileView">
       <ng-container *ngTemplateOutlet="command"></ng-container>
     </app-footer>
 
@@ -38,10 +55,14 @@ import { NgTemplateOutlet } from '@angular/common';
         (selectEvent)="handleSelect($event)"
       />
     </ng-template>
+    <hlm-toaster />
   `,
 })
 export class App {
   #store = inject(AppStore);
+  #chatService = inject(ChatService);
+  msgs = this.#chatService.renderMsgs;
+
   router = inject(Router);
   route = inject(ActivatedRoute);
 
@@ -51,6 +72,8 @@ export class App {
   badges = this.#store.badges;
   isLoading = this.#store.isLoading;
   query = this.#store.query;
+
+  mobileView = signal<Views>('chat');
 
   handleSearch(query: string) {
     this.#store.setQuery(query);
